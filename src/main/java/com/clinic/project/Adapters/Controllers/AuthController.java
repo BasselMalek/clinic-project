@@ -1,12 +1,12 @@
 
-package com.clinic.project.Controllers;
+package com.clinic.project.Adapters.Controllers;
 
-import com.clinic.project.Services.AuthenticationService;
-import com.clinic.project.Model.AuthRequest;
+import com.clinic.project.Domain.Model.AuthRequest;
+import com.clinic.project.Domain.Model.JwtResponse;
+import com.clinic.project.Domain.Services.AuthenticationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import com.clinic.project.Model.JwtResponse;
 
 @RestController
 @RequestMapping("/api/auth")

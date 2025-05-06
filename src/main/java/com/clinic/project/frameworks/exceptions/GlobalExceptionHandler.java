@@ -1,4 +1,4 @@
-package com.clinic.project.exceptions;
+package com.clinic.project.frameworks.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

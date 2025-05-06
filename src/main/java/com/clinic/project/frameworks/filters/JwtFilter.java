@@ -1,6 +1,6 @@
-package com.clinic.project.filters;
+package com.clinic.project.frameworks.filters;
 
-import com.clinic.project.utils.JwtUtil;
+import com.clinic.project.frameworks.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

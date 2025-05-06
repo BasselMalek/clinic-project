@@ -1,4 +1,4 @@
-package com.clinic.project.Model;
+package com.clinic.project.Domain.Model;
 
 import jakarta.persistence.*;
 

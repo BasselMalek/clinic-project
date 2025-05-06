@@ -1,7 +1,7 @@
-package com.clinic.project.Services;
+package com.clinic.project.Domain.Services;
 
-import com.clinic.project.Model.User;
-import com.clinic.project.Repositories.UserRepository;
+import com.clinic.project.Domain.Model.User;
+import com.clinic.project.Adapters.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

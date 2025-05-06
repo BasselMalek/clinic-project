@@ -1,16 +1,15 @@
-package com.clinic.project.Services;
+package com.clinic.project.Domain.Services;
 
-import com.clinic.project.Model.User;
-import com.clinic.project.Repositories.UserRepository;
-import com.clinic.project.utils.JwtUtil;
+import com.clinic.project.Domain.Model.JwtResponse;
+import com.clinic.project.Domain.Model.Role;
+import com.clinic.project.Domain.Model.User;
+import com.clinic.project.Adapters.Repositories.UserRepository;
+import com.clinic.project.frameworks.exceptions.InvalidCredentialsException;
+import com.clinic.project.frameworks.exceptions.UserAlreadyExistsException;
+import com.clinic.project.frameworks.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.clinic.project.Model.JwtResponse;
-import com.clinic.project.exceptions.UserAlreadyExistsException;
-import com.clinic.project.exceptions.InvalidCredentialsException;
-import com.clinic.project.Model.Role;
 
 @Service
 public class AuthenticationService {

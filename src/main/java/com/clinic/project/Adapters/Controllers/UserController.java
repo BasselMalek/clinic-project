@@ -1,8 +1,8 @@
-package com.clinic.project.Controllers;
+package com.clinic.project.Adapters.Controllers;
 
-import com.clinic.project.Model.User;
+import com.clinic.project.Domain.Model.User;
+import com.clinic.project.Domain.Services.UserService;
 
-import com.clinic.project.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
