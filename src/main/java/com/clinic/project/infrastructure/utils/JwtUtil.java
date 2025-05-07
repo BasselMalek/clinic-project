@@ -1,4 +1,4 @@
-package com.clinic.project.frameworks.utils;
+package com.clinic.project.infrastructure.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

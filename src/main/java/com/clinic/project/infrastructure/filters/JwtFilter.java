@@ -1,9 +1,11 @@
-package com.clinic.project.frameworks.filters;
+package com.clinic.project.infrastructure.filters;
 
-import com.clinic.project.frameworks.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.clinic.project.infrastructure.utils.JwtUtil;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import javax.servlet.http.HttpServletResponse;

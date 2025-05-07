@@ -1,4 +1,4 @@
-package com.clinic.project.frameworks.config;
+package com.clinic.project.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.clinic.project.frameworks.filters.JwtFilter;
+import com.clinic.project.infrastructure.filters.JwtFilter;
 
 @Configuration
 public class SecurityConfig {
