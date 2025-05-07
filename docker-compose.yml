@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  clinic-service:
+    build: .
+    container_name: clinic-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/clinic?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 
