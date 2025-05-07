@@ -6,10 +6,13 @@ import com.clinic.project.Domain.Model.Appointment;
 import com.clinic.project.Domain.Model.AppointmentStatus;
 import com.clinic.project.Domain.Model.Bill;
 import com.clinic.project.Domain.Model.BillingItem;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +41,11 @@ public class BillingService {
 
     @Transactional(readOnly = true)
     public Bill getBillByAppointmentId(Long appointmentId) {
-        return billingRepository.findByAppointmentId(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Bill not found for appointment ID: " + appointmentId));
+        List<Bill> bills = billingRepository.findByAppointmentId(appointmentId);
+        if (bills.isEmpty()) {
+            throw new IllegalArgumentException("Bill not found for appointment ID: " + appointmentId);
+        }
+        return bills.get(0); // Assuming you want the first bill in the list
     }
 
     @Transactional
@@ -102,5 +108,16 @@ public class BillingService {
                 .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
         bill.setNotes(note);
         return billingRepository.save(bill);
+    }
+
+    @Transactional
+
+    public Bill processBilling(Long appointmentId,long PatientId, BigDecimal baseAmount) {
+        Bill billing = new Bill(appointmentId, PatientId);
+        List<BillingItem> billItems = new ArrayList<>();
+        billItems.add(new BillingItem("Standard Consult Fee", baseAmount, billing));    
+        billing.setItems(billItems);
+
+        return billingRepository.save(billing);
     }
 }

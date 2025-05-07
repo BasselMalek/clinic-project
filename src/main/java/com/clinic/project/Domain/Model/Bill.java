@@ -22,7 +22,7 @@ public class Bill {
     private LocalDateTime issuedDate;
 
     @Column(nullable = false)
-    private long paymentID; // Changed from UUID to long
+    private long paymentID; 
 
     private LocalDateTime paidDate;
 

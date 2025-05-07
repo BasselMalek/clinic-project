@@ -12,7 +12,6 @@ public interface BillingRepository extends JpaRepository<Bill, Long> {
     Optional<Bill> findById(long id);
     List<Bill> findByPatientId(long patientId);
     Optional<Bill> findByAppointmentId(long appointmentId);
-    
-    // Add this method for deletion
     void deleteById(long id);
+    List<Bill> findByAppointmentId(Long appointmentId);
 }
