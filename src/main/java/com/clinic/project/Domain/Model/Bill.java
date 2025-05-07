@@ -4,26 +4,25 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "bills")
 public class Bill {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(nullable = false)
-    private UUID appointmentId;
+    private long appointmentId;
 
     @Column(nullable = false)
-    private UUID patientId;
+    private long patientId;
 
     private LocalDateTime issuedDate;
 
     @Column(nullable = false)
-    private UUID paymentID;
+    private long paymentID; // Changed from UUID to long
 
     private LocalDateTime paidDate;
 
@@ -33,7 +32,6 @@ public class Bill {
 
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BillingItem> items;
-
 
     @Column(precision = 10, scale = 2)
     private BigDecimal totalAmount;
@@ -45,8 +43,7 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(UUID appointmentId, UUID patientId) {
-        this.id = UUID.randomUUID();
+    public Bill(long appointmentId, long patientId) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
         this.status = BillStatus.UNPAID;
@@ -54,13 +51,15 @@ public class Bill {
     }
 
     // Getters and Setters
-    public UUID getId() {
+    public long getId() {
         return id;
     }
-    public UUID getAppointmentId() {
+
+    public long getAppointmentId() {
         return appointmentId;
     }
-    public UUID getPatientId() {
+
+    public long getPatientId() {
         return patientId;
     }
 
@@ -102,12 +101,14 @@ public class Bill {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    public void markAsPaid(UUID paymentID, LocalDateTime paymentTime){
+
+    public void markAsPaid(long paymentID, LocalDateTime paymentTime) { // Updated to use long
         this.paymentID = paymentID;
         this.status = BillStatus.PAID;
         this.paidDate = paymentTime;
     }
-    public void cancelBill(){
+
+    public void cancelBill() {
         this.status = BillStatus.CANCELED;
     }
 }

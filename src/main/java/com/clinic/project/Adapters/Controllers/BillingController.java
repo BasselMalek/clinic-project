@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/billing")
@@ -21,9 +20,8 @@ public class BillingController {
         this.billingService = billingService;
     }
 
-
     @GetMapping("/{billId}")
-    public ResponseEntity<Bill> getBill(@PathVariable UUID billId) {
+    public ResponseEntity<Bill> getBill(@PathVariable Long billId) {
         try {
             Bill bill = billingService.getBill(billId);
             return ResponseEntity.ok(bill);
@@ -33,13 +31,13 @@ public class BillingController {
     }
 
     @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<Bill>> getPatientBills(@PathVariable UUID patientId) {
+    public ResponseEntity<List<Bill>> getPatientBills(@PathVariable Long patientId) {
         List<Bill> bills = billingService.getBillsByPatientId(patientId);
         return ResponseEntity.ok(bills);
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<Bill> getBillByAppointment(@PathVariable UUID appointmentId) {
+    public ResponseEntity<Bill> getBillByAppointment(@PathVariable Long appointmentId) {
         try {
             Bill bill = billingService.getBillByAppointmentId(appointmentId);
             return ResponseEntity.ok(bill);
@@ -49,7 +47,7 @@ public class BillingController {
     }
 
     @PostMapping("/generate/{appointmentId}")
-    public ResponseEntity<Bill> generateBill(@PathVariable UUID appointmentId) {
+    public ResponseEntity<Bill> generateBill(@PathVariable Long appointmentId) {
         try {
             Bill bill = billingService.generateBillFromAppointment(appointmentId);
             return ResponseEntity.ok(bill);
@@ -61,7 +59,7 @@ public class BillingController {
     }
 
     @PutMapping("/{billId}/items")
-    public ResponseEntity<Bill> updateBillItems(@PathVariable UUID billId,
+    public ResponseEntity<Bill> updateBillItems(@PathVariable Long billId,
                                                 @RequestBody List<BillingItem> items) {
         try {
             Bill updatedBill = billingService.updateBillItems(billId, items);
@@ -72,8 +70,8 @@ public class BillingController {
     }
 
     @PutMapping("/{billId}/pay")
-    public ResponseEntity<Bill> markBillAsPaid(@PathVariable UUID billId,
-                                               @RequestBody UUID paymentId) {
+    public ResponseEntity<Bill> markBillAsPaid(@PathVariable Long billId,
+                                               @RequestBody Long paymentId) {
         try {
             Bill paidBill = billingService.markBillAsPaid(billId, paymentId);
             return ResponseEntity.ok(paidBill);
@@ -83,7 +81,7 @@ public class BillingController {
     }
 
     @PutMapping("/{billId}/notes")
-    public ResponseEntity<Bill> addNotesToBill(@PathVariable UUID billId,
+    public ResponseEntity<Bill> addNotesToBill(@PathVariable Long billId,
                                                @RequestBody String note) {
         try {
             Bill updatedBill = billingService.notateBill(billId, note);

@@ -3,6 +3,7 @@ package com.clinic.project.Domain.Model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name = "appointments")
 public class Appointment {
@@ -22,7 +23,11 @@ public class Appointment {
     private LocalDateTime dateTime;
 
     @Enumerated(EnumType.STRING)
+    private AppointmentType type; 
+
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+
 
     private String notes;
 
@@ -74,5 +79,14 @@ public class Appointment {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    //set and get type
+   
+    public AppointmentType getType() {
+        return type;
+    }
+    public void setType(AppointmentType type) {
+        this.type = type;
     }
 }

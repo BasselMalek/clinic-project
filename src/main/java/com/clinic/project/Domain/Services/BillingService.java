@@ -13,10 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class BillingService {
+
     private final BillingRepository billingRepository;
     private final AppointmentRepository appointmentRepository;
 
@@ -26,76 +26,80 @@ public class BillingService {
     }
 
     @Transactional(readOnly = true)
-    public Bill getBill(UUID billId) {
+    public Bill getBill(Long billId) {
         return billingRepository.findById(billId)
-                .orElseThrow(() -> new RuntimeException("Bill not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
     }
 
     @Transactional(readOnly = true)
-    public List<Bill> getBillsByPatientId(UUID patientId) {
+    public List<Bill> getBillsByPatientId(Long patientId) {
         return billingRepository.findByPatientId(patientId);
     }
 
     @Transactional(readOnly = true)
-    public Bill getBillByAppointmentId(UUID appointmentId) {
+    public Bill getBillByAppointmentId(Long appointmentId) {
         return billingRepository.findByAppointmentId(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Bill not found for this appointment"));
+                .orElseThrow(() -> new IllegalArgumentException("Bill not found for appointment ID: " + appointmentId));
     }
 
     @Transactional
-    public Bill generateBillFromAppointment(UUID appointmentId) {
+    public Bill generateBillFromAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found with ID: " + appointmentId));
 
         if (appointment.getStatus() != AppointmentStatus.ATTENDED) {
-            throw new IllegalStateException("Cannot generate bill for missed appointment");
+            throw new IllegalStateException("Cannot generate bill for an appointment that was not attended");
         }
-        Bill bill = new Bill(UUID.randomUUID(), appointmentId, appointment.getPatientId());
 
+        Long patientId = appointment.getPatient().getId();
+
+        Bill bill = new Bill(appointmentId, patientId);
         List<BillingItem> billItems = new ArrayList<>();
 
         // Add standard appointment fee
-        billItems.add(new BillingItem(
-                "Standard Consult fee",
-                new java.math.BigDecimal("100.00"),
-                bill
-        ));
+        billItems.add(new BillingItem("Standard Consult Fee", new BigDecimal("100.00"), bill));
 
+        // Add additional fees based on appointment type
         switch (appointment.getType()) {
             case PROCEDURE:
                 billItems.add(new BillingItem("In-office Procedure Fee", new BigDecimal("500.00"), bill));
+                break;
             case CHECKUP:
-                billItems.add(new BillingItem("Regular Checkup fee", new BigDecimal("50.00"), bill));
+                billItems.add(new BillingItem("Regular Checkup Fee", new BigDecimal("50.00"), bill));
+                break;
             case PHYSICAL:
-                billItems.add(new BillingItem("Full Physical fee", new BigDecimal("150.00"), bill));
+                billItems.add(new BillingItem("Full Physical Fee", new BigDecimal("150.00"), bill));
+                break;
             case CONSULT:
             default:
                 break;
         }
+
         bill.setItems(billItems);
         return billingRepository.save(bill);
     }
+
     @Transactional
-    public Bill updateBillItems(UUID billId, List<BillingItem> items) {
+    public Bill updateBillItems(Long billId, List<BillingItem> items) {
         Bill bill = billingRepository.findById(billId)
-                .orElseThrow(() -> new RuntimeException("Bill not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
         bill.setItems(items);
         return billingRepository.save(bill);
     }
 
     @Transactional
-    public Bill markBillAsPaid(UUID billId, UUID paymentId) {
+    public Bill markBillAsPaid(Long billId, Long paymentId) {
         Bill bill = billingRepository.findById(billId)
-                .orElseThrow(() -> new RuntimeException("Bill not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
 
         bill.markAsPaid(paymentId, LocalDateTime.now());
         return billingRepository.save(bill);
     }
 
     @Transactional
-    public Bill notateBill(UUID billId, String note){
+    public Bill notateBill(Long billId, String note) {
         Bill bill = billingRepository.findById(billId)
-                .orElseThrow(() -> new RuntimeException("Bill not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
         bill.setNotes(note);
         return billingRepository.save(bill);
     }
