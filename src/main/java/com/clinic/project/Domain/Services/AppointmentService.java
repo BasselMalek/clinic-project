@@ -42,6 +42,23 @@ public class AppointmentService {
         }
         return null;
     }
+    public List<Appointment> getAppointmentsByDoctorId(Long doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId);
+    }
+    
+    public Appointment updateAppointmentStatus(Long appointmentId, AppointmentStatus status) {
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null);
+        if (appointment != null) {
+            appointment.setStatus(status);
+            return appointmentRepository.save(appointment);
+        }
+        return null;
+    }
+    public List<Appointment> getAppointmentsByPatientId(Long patientId) {
+        return appointmentRepository.findByPatientId(patientId);
+    }
+    
+    
 
     
 }
