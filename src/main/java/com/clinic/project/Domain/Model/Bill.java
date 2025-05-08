@@ -20,10 +20,6 @@ public class Bill {
     private long patientId;
 
     private LocalDateTime issuedDate;
-
-    @Column(nullable = false)
-    private long paymentID; 
-
     private LocalDateTime paidDate;
 
     @Enumerated(EnumType.STRING)
@@ -102,8 +98,7 @@ public class Bill {
         this.notes = notes;
     }
 
-    public void markAsPaid(long paymentID, LocalDateTime paymentTime) { // Updated to use long
-        this.paymentID = paymentID;
+    public void markAsPaid(LocalDateTime paymentTime) { // Updated to use long
         this.status = BillStatus.PAID;
         this.paidDate = paymentTime;
     }

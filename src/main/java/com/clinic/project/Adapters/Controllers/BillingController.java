@@ -73,16 +73,6 @@ public class BillingController {
         }
     }
 
-    @PutMapping("/{billId}/pay")
-    public ResponseEntity<Bill> markBillAsPaid(@PathVariable Long billId,
-                                               @RequestBody Long paymentId) {
-        try {
-            Bill paidBill = billingService.markBillAsPaid(billId, paymentId);
-            return ResponseEntity.ok(paidBill);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
 
     @PutMapping("/{billId}/notes")
     public ResponseEntity<Bill> addNotesToBill(@PathVariable Long billId,
@@ -93,14 +83,5 @@ public class BillingController {
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-    }
-
-    @PostMapping("/process")
-    public ResponseEntity<Bill> processBilling(
-            @RequestParam Long appointmentId,
-            @RequestParam long patientId,
-            @RequestParam BigDecimal amount ){
-        Bill billing = billingService.processBilling(appointmentId, patientId ,amount);
-        return ResponseEntity.ok(billing);
     }
 }
