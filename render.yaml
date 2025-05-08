@@ -1,0 +1,27 @@
+version: 1.0
+
+services:
+  clinic-service:
+    type: web
+    name: clinic-service
+    env: docker
+    docker:
+      buildCommand: |
+        # Stage 1: Build the JAR
+        FROM maven:3.9.6-eclipse-temurin-17 AS build
+        WORKDIR /app
+        COPY pom.xml .
+        COPY src ./src
+        RUN mvn clean package -DskipTests
+
+        # Stage 2: Run the application
+        FROM eclipse-temurin:17-jdk
+        WORKDIR /app
+        COPY --from=build /app/target/*.jar clinic.jar
+        ENTRYPOINT ["java", "-jar", "clinic.jar"]
+    plan: free
+    envVars:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/clinic?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 
+    autoDeploy: true
