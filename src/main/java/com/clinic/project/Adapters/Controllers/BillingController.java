@@ -86,16 +86,6 @@ public class BillingController {
         }
     }
 
-    @PutMapping("/{billId}/pay")
-    public ResponseEntity<Bill> markBillAsPaid(@PathVariable Long billId,
-                                               @RequestBody Long paymentId) {
-        try {
-            Bill paidBill = billingService.markBillAsPaid(billId, paymentId);
-            return ResponseEntity.ok(paidBill);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
 
     @PutMapping("/{billId}/notes")
     public ResponseEntity<Bill> addNotesToBill(@PathVariable Long billId,
@@ -105,25 +95,6 @@ public class BillingController {
             return ResponseEntity.ok(updatedBill);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
-
-    @PostMapping("/process")
-    public ResponseEntity<Bill> processBilling(
-            @RequestParam Long appointmentId,
-            @RequestBody User user, // Accept User entity
-            @RequestParam BigDecimal amount) {
-
-        // Validate the appointment
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found with ID: " + appointmentId));
-
-        // Process the billing
-        try {
-            Bill bill = billingService.processBilling(appointment, user, amount);
-            return ResponseEntity.ok(bill);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }

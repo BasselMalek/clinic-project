@@ -94,11 +94,11 @@ public class BillingService {
     }
 
     @Transactional
-    public Bill markBillAsPaid(Long billId, Long paymentId) {
+    public Bill markBillAsPaid(Long billId) {
         Bill bill = billingRepository.findById(billId)
                 .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
 
-        bill.markAsPaid(paymentId, LocalDateTime.now());
+        bill.markAsPaid(LocalDateTime.now());
         return billingRepository.save(bill);
     }
 
@@ -108,15 +108,5 @@ public class BillingService {
                 .orElseThrow(() -> new IllegalArgumentException("Bill not found with ID: " + billId));
         bill.setNotes(note);
         return billingRepository.save(bill);
-    }
-
-    @Transactional
-    public Bill processBilling(Appointment appointment, User user, BigDecimal baseAmount) { // Use entities
-        Bill billing = new Bill(appointment, user);
-        List<BillingItem> billItems = new ArrayList<>();
-        billItems.add(new BillingItem("Standard Consult Fee", baseAmount, billing));
-        billing.setItems(billItems);
-
-        return billingRepository.save(billing);
     }
 }
