@@ -3,9 +3,14 @@ package com.clinic.project.Domain.Model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 
 @Entity
 @Table(name = "billing_items")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class BillingItem {
 
     @Id
@@ -19,6 +24,7 @@ public class BillingItem {
     private BigDecimal value;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "bill_id", nullable = false)
     private Bill bill;
 

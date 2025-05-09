@@ -1,6 +1,6 @@
 package com.clinic.project.Adapters.Controllers;
 
-import com.clinic.project.Domain.Model.Bill;
+
 import com.clinic.project.Domain.Model.PaymentMethod;
 import com.clinic.project.Domain.Services.BillingService;
 import com.clinic.project.Domain.Services.PaymentService;
@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/payments")

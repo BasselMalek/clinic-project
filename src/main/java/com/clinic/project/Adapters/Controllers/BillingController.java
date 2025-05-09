@@ -3,7 +3,6 @@ package com.clinic.project.Adapters.Controllers;
 import com.clinic.project.Domain.Model.Bill;
 import com.clinic.project.Domain.Model.BillingItem;
 import com.clinic.project.Domain.Model.Appointment;
-import com.clinic.project.Domain.Model.User;
 import com.clinic.project.Domain.Services.BillingService;
 import com.clinic.project.Adapters.Repositories.AppointmentRepository;
 
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController

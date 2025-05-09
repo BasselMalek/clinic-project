@@ -1,8 +1,8 @@
 package com.clinic.project.Adapters.Repositories;
 
-import com.clinic.project.Domain.Model.Appointment;
+
 import com.clinic.project.Domain.Model.Bill;
-import com.clinic.project.Domain.Model.User;
+
 
 import java.util.List;
 import java.util.Optional;

@@ -6,8 +6,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
+
 @Table(name = "bills")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Bill {
 
     @Id
@@ -15,11 +22,13 @@ public class Bill {
     private long id;
 
     @ManyToOne(optional = false)
+    @JsonManagedReference 
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment; 
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     private LocalDateTime issuedDate;
@@ -30,7 +39,8 @@ public class Bill {
     private BillStatus status;
 
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BillingItem> items = new ArrayList<>(); // Initialize the list
+    @JsonManagedReference 
+    private List<BillingItem> items = new ArrayList<>(); 
 
     @Column(precision = 10, scale = 2)
     private BigDecimal totalAmount;
