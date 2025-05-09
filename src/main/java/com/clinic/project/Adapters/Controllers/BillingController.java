@@ -2,9 +2,11 @@ package com.clinic.project.Adapters.Controllers;
 
 import com.clinic.project.Domain.Model.Bill;
 import com.clinic.project.Domain.Model.BillingItem;
+import com.clinic.project.Domain.Model.Appointment;
+import com.clinic.project.Domain.Model.User;
 import com.clinic.project.Domain.Services.BillingService;
+import com.clinic.project.Adapters.Repositories.AppointmentRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +15,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/billing")
 public class BillingController {
 
     private final BillingService billingService;
+    private final AppointmentRepository appointmentRepository;
 
-    public BillingController(BillingService billingService) {
+    public BillingController(BillingService billingService, AppointmentRepository appointmentRepository) {
         this.billingService = billingService;
+        this.appointmentRepository = appointmentRepository;
     }
 
     @GetMapping("/{billId}")
@@ -34,25 +37,35 @@ public class BillingController {
         }
     }
 
-    @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<Bill>> getPatientBills(@PathVariable Long patientId) {
-        List<Bill> bills = billingService.getBillsByPatientId(patientId);
-        return ResponseEntity.ok(bills);
-    }
-
-    @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<Bill> getBillByAppointment(@PathVariable Long appointmentId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Bill>> getUserBills(@PathVariable Long userId) {
         try {
-            Bill bill = billingService.getBillByAppointmentId(appointmentId);
-            return ResponseEntity.ok(bill);
+            List<Bill> bills = billingService.getBillsByUserId(userId);
+            return ResponseEntity.ok(bills);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
+    @GetMapping("/appointment/{appointmentId}")
+    public ResponseEntity<Bill> getBillByAppointment(@PathVariable Long appointmentId) {
+        try {
+            Bill bill = billingService.getBillByAppointment(appointmentId);
+            return ResponseEntity.ok(bill);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
     @PostMapping("/generate/{appointmentId}")
     public ResponseEntity<Bill> generateBill(@PathVariable Long appointmentId) {
         try {
+            Appointment appointment = appointmentRepository.findById(appointmentId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found with ID: " + appointmentId));
+
+            // if (appointment.getType() == null) {
+            //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Appointment type is not set for appointment ID: " + appointmentId);
+            // }
+    
             Bill bill = billingService.generateBillFromAppointment(appointmentId);
             return ResponseEntity.ok(bill);
         } catch (IllegalStateException e) {
@@ -98,9 +111,19 @@ public class BillingController {
     @PostMapping("/process")
     public ResponseEntity<Bill> processBilling(
             @RequestParam Long appointmentId,
-            @RequestParam long patientId,
-            @RequestParam BigDecimal amount ){
-        Bill billing = billingService.processBilling(appointmentId, patientId ,amount);
-        return ResponseEntity.ok(billing);
+            @RequestBody User user, // Accept User entity
+            @RequestParam BigDecimal amount) {
+
+        // Validate the appointment
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found with ID: " + appointmentId));
+
+        // Process the billing
+        try {
+            Bill bill = billingService.processBilling(appointment, user, amount);
+            return ResponseEntity.ok(bill);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

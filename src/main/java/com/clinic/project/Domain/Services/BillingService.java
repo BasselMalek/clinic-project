@@ -6,13 +6,12 @@ import com.clinic.project.Domain.Model.Appointment;
 import com.clinic.project.Domain.Model.AppointmentStatus;
 import com.clinic.project.Domain.Model.Bill;
 import com.clinic.project.Domain.Model.BillingItem;
+import com.clinic.project.Domain.Model.User; // Import User entity
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +34,12 @@ public class BillingService {
     }
 
     @Transactional(readOnly = true)
-    public List<Bill> getBillsByPatientId(Long patientId) {
-        return billingRepository.findByPatientId(patientId);
+    public List<Bill> getBillsByUserId(Long userId) { // Change method to use User ID
+        return billingRepository.findByUser_Id(userId);
     }
 
     @Transactional(readOnly = true)
-    public Bill getBillByAppointmentId(Long appointmentId) {
+    public Bill getBillByAppointment(Long appointmentId) {
         List<Bill> bills = billingRepository.findByAppointmentId(appointmentId);
         if (bills.isEmpty()) {
             throw new IllegalArgumentException("Bill not found for appointment ID: " + appointmentId);
@@ -57,32 +56,33 @@ public class BillingService {
             throw new IllegalStateException("Cannot generate bill for an appointment that was not attended");
         }
 
-        Long patientId = appointment.getPatient().getId();
+        User user = appointment.getPatient(); 
 
-        Bill bill = new Bill(appointmentId, patientId);
+        Bill bill = new Bill(appointment, user); 
+
         List<BillingItem> billItems = new ArrayList<>();
-
-        // Add standard appointment fee
         billItems.add(new BillingItem("Standard Consult Fee", new BigDecimal("100.00"), bill));
 
-        // Add additional fees based on appointment type
-        switch (appointment.getType()) {
-            case PROCEDURE:
-                billItems.add(new BillingItem("In-office Procedure Fee", new BigDecimal("500.00"), bill));
-                break;
-            case CHECKUP:
-                billItems.add(new BillingItem("Regular Checkup Fee", new BigDecimal("50.00"), bill));
-                break;
-            case PHYSICAL:
-                billItems.add(new BillingItem("Full Physical Fee", new BigDecimal("150.00"), bill));
-                break;
-            case CONSULT:
-            default:
-                break;
-        }
+      //Add additional fees based on appointment type
+      
+      switch (appointment.getType()) {
+        case PROCEDURE:
+            billItems.add(new BillingItem("In-office Procedure Fee", new BigDecimal("500.00"), bill));
+            break;
+        case CHECKUP:
+            billItems.add(new BillingItem("Regular Checkup Fee", new BigDecimal("50.00"), bill));
+            break;
+        case PHYSICAL:
+            billItems.add(new BillingItem("Full Physical Fee", new BigDecimal("150.00"), bill));
+            break;
+        case CONSULT:
+        default:
+            break;
+    }
 
         bill.setItems(billItems);
-        return billingRepository.save(bill);
+        billingRepository.save(bill);
+        return bill;
     }
 
     @Transactional
@@ -111,11 +111,10 @@ public class BillingService {
     }
 
     @Transactional
-
-    public Bill processBilling(Long appointmentId,long PatientId, BigDecimal baseAmount) {
-        Bill billing = new Bill(appointmentId, PatientId);
+    public Bill processBilling(Appointment appointment, User user, BigDecimal baseAmount) { // Use entities
+        Bill billing = new Bill(appointment, user);
         List<BillingItem> billItems = new ArrayList<>();
-        billItems.add(new BillingItem("Standard Consult Fee", baseAmount, billing));    
+        billItems.add(new BillingItem("Standard Consult Fee", baseAmount, billing));
         billing.setItems(billItems);
 
         return billingRepository.save(billing);

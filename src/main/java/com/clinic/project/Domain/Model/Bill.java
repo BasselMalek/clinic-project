@@ -3,6 +3,7 @@ package com.clinic.project.Domain.Model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,16 +14,18 @@ public class Bill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
-    private long appointmentId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "appointment_id", nullable = false)
+    private Appointment appointment; 
 
-    @Column(nullable = false)
-    private long patientId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private LocalDateTime issuedDate;
 
     @Column(nullable = false)
-    private long paymentID; 
+    private long paymentID;
 
     private LocalDateTime paidDate;
 
@@ -31,7 +34,7 @@ public class Bill {
     private BillStatus status;
 
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BillingItem> items;
+    private List<BillingItem> items = new ArrayList<>(); // Initialize the list
 
     @Column(precision = 10, scale = 2)
     private BigDecimal totalAmount;
@@ -43,9 +46,9 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(long appointmentId, long patientId) {
-        this.appointmentId = appointmentId;
-        this.patientId = patientId;
+    public Bill(Appointment appointment, User patient) { // Updated to use Appointment and Patient entities
+        this.appointment = appointment;
+        this.user = patient;
         this.status = BillStatus.UNPAID;
         this.issuedDate = LocalDateTime.now();
     }
@@ -55,12 +58,12 @@ public class Bill {
         return id;
     }
 
-    public long getAppointmentId() {
-        return appointmentId;
+    public Appointment getAppointment() {
+        return appointment;
     }
 
-    public long getPatientId() {
-        return patientId;
+    public User getPatient() {
+        return user;
     }
 
     public LocalDateTime getIssuedDate() {
@@ -84,8 +87,7 @@ public class Bill {
         if (items != null) {
             this.items.addAll(items);
         }
-        BigDecimal preTax = this.items.stream().map(BillingItem::getValue).reduce(BigDecimal.ZERO,
-                BigDecimal::add);
+        BigDecimal preTax = this.items.stream().map(BillingItem::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
         this.items.add(new BillingItem("14% VAT", (preTax.multiply(new BigDecimal("0.14"))), this));
         this.totalAmount = this.items.stream().map(BillingItem::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -102,7 +104,7 @@ public class Bill {
         this.notes = notes;
     }
 
-    public void markAsPaid(long paymentID, LocalDateTime paymentTime) { // Updated to use long
+    public void markAsPaid(long paymentID, LocalDateTime paymentTime) {
         this.paymentID = paymentID;
         this.status = BillStatus.PAID;
         this.paidDate = paymentTime;

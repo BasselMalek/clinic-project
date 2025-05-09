@@ -2,15 +2,15 @@ package com.clinic.project.Domain.Model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "billing_items")
 public class BillingItem {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(nullable = false)
     private String label;
@@ -26,14 +26,14 @@ public class BillingItem {
     }
 
     public BillingItem(String label, BigDecimal value, Bill bill) {
-        this.id = UUID.randomUUID();
+    
         this.label = label;
         this.value = value;
         this.bill = bill;
     }
 
     // Getters and Setters
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 

@@ -81,10 +81,9 @@ public class Appointment {
         this.notes = notes;
     }
 
-    //set and get type
-   
+ 
     public AppointmentType getType() {
-        return type;
+        return this.type;
     }
     public void setType(AppointmentType type) {
         this.type = type;
