@@ -37,7 +37,7 @@ public class AuthenticationService {
         return new JwtResponse(token);
     }
 
-    public String register(String username, String password) {
+    public String register(String username, String password, String email) {
         // Check if user already exists
         if (userRepository.findByUsername(username) != null) {
             throw new UserAlreadyExistsException("User with username '" + username + "' already exists");
@@ -46,6 +46,7 @@ public class AuthenticationService {
         // Create a new user and save to the database
         User newUser = new User();
         newUser.setUsername(username);
+        newUser.setEmail(email); 
         newUser.setPassword(passwordEncoder.encode(password)); 
         newUser.setRole(Role.PATIENT); 
         userRepository.save(newUser);
