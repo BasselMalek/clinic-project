@@ -10,6 +10,7 @@ public static void main(String[] args) {
     System.out.println("---- DATABASE ENVIRONMENT ----");
     System.out.println("URL: " + System.getenv("SPRING_DATASOURCE_URL"));
     System.out.println("USER: " + System.getenv("SPRING_DATASOURCE_USERNAME"));
+    System.out.println("USER: " + System.getenv("MYSQLHOST"));
     SpringApplication.run(ProjectApplication.class, args);
 }
 
