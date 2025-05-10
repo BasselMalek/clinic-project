@@ -6,6 +6,8 @@ services:
         container_name: db
         ports:
             - "3306:3306"
+        volumes:
+            - /mnt/mysql-data:/var/lib/mysql
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: true
             MYSQL_ROOT_PASSWORD:
