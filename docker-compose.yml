@@ -9,8 +9,8 @@ services:
         volumes:
             - /var/lib/mysql_data:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: rootpass
-            MYSQL_DATABASE: clinic_db
+            MYSQL_ROOT_PASSWORD: 
+            MYSQL_DATABASE: clinic
         restart: always
         networks:
             - clinic-network
@@ -28,7 +28,7 @@ services:
         environment:
             SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/clinic_db?createDatabaseIfNotExist=true
             SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD: rootpass
+            SPRING_DATASOURCE_PASSWORD: 
         depends_on:
             - db
         restart: on-failure:2
