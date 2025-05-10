@@ -10,8 +10,6 @@ services:
             SPRING_DATASOURCE_URL: jdbc:mysql://clinic-rds.cf24ae0s8m8a.eu-north-1.rds.amazonaws.com:3306/clinic?createDatabaseIfNotExist=true
             SPRING_DATASOURCE_USERNAME: admin
             SPRING_DATASOURCE_PASSWORD: adminadmin1
-        depends_on:
-            - db
         restart: on-failure:2
         deploy:
             resources:
