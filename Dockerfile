@@ -7,6 +7,7 @@ RUN mvn clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:17-jdk
-WORKDIR /app
+    WORKDIR /app
 COPY --from=build /app/target/*.jar clinic.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "clinic.jar"]
