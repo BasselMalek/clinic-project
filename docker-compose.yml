@@ -1,3 +1,5 @@
+version: "3.8"
+services:
     clinic-service:
         build: .
         container_name: clinic-service
@@ -6,4 +8,4 @@
         environment:
             SPRING_DATASOURCE_URL: jdbc:mysql://root:xANMbVbBSIJyJILUWzdlVeKRRimxYjol@yamabiko.proxy.rlwy.net:16022/railway?createDatabaseIfNotExist=true
             SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD: testing
+            SPRING_DATASOURCE_PASSWORD: xANMbVbBSIJyJILUWzdlVeKRRimxYjol
