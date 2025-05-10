@@ -10,10 +10,6 @@ services:
             MYSQL_ROOT_PASSWORD: test
             MYSQL_DATABASE: clinic
         restart: always
-        deploy:
-            resources:
-                limits:
-                    memory: 256M
 
     # clinic-service:
     #     build: .
