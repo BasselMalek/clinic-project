@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/billing")
+@CrossOrigin(origins = "*")
 public class BillingController {
 
     private final BillingService billingService;
