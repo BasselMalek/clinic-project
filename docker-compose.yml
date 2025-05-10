@@ -6,6 +6,6 @@ services:
         ports:
             - "8080:8080"
         environment:
-            SPRING_DATASOURCE_URL: jdbc:${MySQL.MYSQL_URL}?createDatabaseIfNotExist=true
-            SPRING_DATASOURCE_USERNAME: ${ MySQL.MYSQLUSER }
-            SPRING_DATASOURCE_PASSWORD: ${ MySQL.MYSQLPASSWORD }
+            SPRING_DATASOURCE_URL: jdbc:${MYSQL_URL}?createDatabaseIfNotExist=true
+            SPRING_DATASOURCE_USERNAME: ${ MYSQLUSER }
+            SPRING_DATASOURCE_PASSWORD: ${ MYSQLPASSWORD }
