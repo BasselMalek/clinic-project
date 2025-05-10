@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Profile - Billing Management</title>
+  <link href="assets/css/theme.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Billing Management</h1>
+    <div id="staff-section" style="display: none;">
+      <!-- Search Bill Section -->
+      <div class="mb-4">
+        <h3>Search Bills</h3>
+        <form id="search-bill-form">
+          <div class="mb-3">
+            <label for="billId" class="form-label">Bill ID</label>
+            <input type="number" class="form-control" id="billId" placeholder="Enter Bill ID">
+          </div>
+          <button type="submit" class="btn btn-primary">Search Bill</button>
+        </form>
+      </div>
+
+      <!-- Generate Bill Section -->
+      <div class="mb-4">
+        <h3>Generate Bill</h3>
+        <form id="generate-bill-form">
+          <div class="mb-3">
+            <label for="appointmentId" class="form-label">Appointment ID</label>
+            <input type="number" class="form-control" id="appointmentId" placeholder="Enter Appointment ID">
+          </div>
+          <button type="submit" class="btn btn-primary">Generate Bill</button>
+        </form>
+      </div>
+
+      <!-- Bill Details Section -->
+      <div id="bill-details" class="mt-4" style="display: none;">
+        <h3>Bill Details</h3>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="bill-details-table">
+            <!-- Bill details will be dynamically inserted here -->
+          </tbody>
+        </table>
+
+        <h4>Items</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Item Label</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="bill-items-table">
+            <!-- Bill items will be dynamically inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if the logged-in user is a staff member
+    document.addEventListener('DOMContentLoaded', function () {
+      const jwtToken = localStorage.getItem('jwtToken');
+      const userRole = localStorage.getItem('loggedInUserRole'); // Assume role is stored in localStorage
+
+      if (!jwtToken || userRole !== 'STAFF_MEMBER') {
+        alert('You must be logged in as a staff member to access this page.');
+        window.location.href = 'signin.html';
+        return;
+      }
+
+      // Show the staff section if the user is a staff member
+      document.getElementById('staff-section').style.display = 'block';
+
+      // Handle search bill form submission
+      document.getElementById('search-bill-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const billId = document.getElementById('billId').value;
+
+        try {
+          const response = await fetch(`http://localhost:8080/api/billing/${billId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${jwtToken}`
+            }
+          });
+
+          if (response.ok) {
+            const bill = await response.json();
+            displayBillDetails(bill);
+          } else {
+            alert('Bill not found.');
+          }
+        } catch (err) {
+          console.error('Error fetching bill:', err);
+          alert('An error occurred while fetching the bill.');
+        }
+      });
+
+      // Handle generate bill form submission
+      document.getElementById('generate-bill-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const appointmentId = document.getElementById('appointmentId').value;
+
+        try {
+          const response = await fetch(`http://localhost:8080/api/billing/generate/${appointmentId}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${jwtToken}`
+            }
+          });
+
+          if (response.ok) {
+            const bill = await response.json();
+            alert('Bill generated successfully!');
+            displayBillDetails(bill);
+          } else {
+            alert('Failed to generate bill.');
+          }
+        } catch (err) {
+          console.error('Error generating bill:', err);
+          alert('An error occurred while generating the bill.');
+        }
+      });
+
+      // Function to display bill details in a table
+      function displayBillDetails(bill) {
+        document.getElementById('bill-details').style.display = 'block';
+
+        const billDetailsTable = document.getElementById('bill-details-table');
+        billDetailsTable.innerHTML = `
+          <tr><td>Bill ID</td><td>${bill.id}</td></tr>
+          <tr><td>Issued Date</td><td>${bill.issuedDate}</td></tr>
+          <tr><td>Paid Date</td><td>${bill.paidDate}</td></tr>
+          <tr><td>Status</td><td>${bill.status}</td></tr>
+          <tr><td>Total Amount</td><td>${bill.totalAmount}</td></tr>
+          <tr><td>Notes</td><td>${bill.notes}</td></tr>
+          <tr><td>Patient</td><td>${bill.patient.username} (${bill.patient.role})</td></tr>
+          <tr><td>Doctor</td><td>${bill.appointment.doctor.username} (${bill.appointment.doctor.role})</td></tr>
+          <tr><td>Appointment Date</td><td>${bill.appointment.dateTime}</td></tr>
+          <tr><td>Appointment Type</td><td>${bill.appointment.type}</td></tr>
+          <tr><td>Appointment Status</td><td>${bill.appointment.status}</td></tr>
+        `;
+
+        const billItemsTable = document.getElementById('bill-items-table');
+        billItemsTable.innerHTML = bill.items.map(item => `
+          <tr>
+            <td>${item.label}</td>
+            <td>${item.value}</td>
+          </tr>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+
+</html>

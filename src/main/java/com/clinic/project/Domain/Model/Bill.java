@@ -48,6 +48,7 @@ public class Bill {
     @Column(length = 1000)
     private String notes;
 
+
     // Constructors
     public Bill() {
     }

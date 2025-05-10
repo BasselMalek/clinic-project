@@ -23,6 +23,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@RequestBody AuthRequest authRequest) {
-        return authenticationService.register(authRequest.getEmail(), authRequest.getPassword(), authRequest.getUsername());
+        return authenticationService.register(authRequest.getUsername(), authRequest.getPassword(),authRequest.getEmail());
     }
 }

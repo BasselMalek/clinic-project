@@ -24,21 +24,21 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public JwtResponse authenticate(String username, String password) {
-        // Fetch user from the database
-        User user = userRepository.findByUsername(username);
+    public JwtResponse authenticate(String email, String password) {
+        User user = userRepository.findByemail(email);
 
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException("Invalid username or password");
         }
 
-        // Generate JWT token if credentials are valid
-        String token = jwtUtil.generateToken(username);
-        return new JwtResponse(token);
+        String token = jwtUtil.generateToken(email);
+
+        return new JwtResponse(token, user.getId(), user.getUsername(), user.getEmail(), user.getRole().name());
     }
 
+
     public String register(String username, String password, String email) {
-        // Check if user already exists
+        
         if (userRepository.findByUsername(username) != null) {
             throw new UserAlreadyExistsException("User with username '" + username + "' already exists");
         }
@@ -46,11 +46,17 @@ public class AuthenticationService {
         // Create a new user and save to the database
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setEmail(email); 
-        newUser.setPassword(passwordEncoder.encode(password)); 
-        newUser.setRole(Role.PATIENT); 
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setRole(Role.PATIENT);
         userRepository.save(newUser);
 
         return "User registered successfully";
+    }
+
+    
+    public String logout(String token) {
+      
+        return "User logged out successfully";
     }
 }

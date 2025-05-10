@@ -26,7 +26,6 @@ public class UserService {
         return userRepository.findByRole(Role.DOCTOR);
     }
     
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -34,4 +33,5 @@ public class UserService {
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
 }

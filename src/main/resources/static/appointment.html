@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Appointment</title>
+  <link href="assets/css/theme.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 400px;">
+      <h2 class="text-center mb-4">Create Appointment</h2>
+      <form id="appointment-form">
+        <div class="mb-3">
+          <label for="dateTime" class="form-label">Date & Time</label>
+          <input type="datetime-local" class="form-control" id="dateTime" name="dateTime" required>
+        </div>
+        <div class="mb-3">
+          <label for="doctorId" class="form-label">Select Doctor</label>
+          <select class="form-control" id="doctorId" name="doctorId" required>
+            <option value="" disabled selected>Select a doctor</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="type" class="form-label">Appointment Type</label>
+          <select class="form-control" id="type" name="type" required>
+            <option value="" disabled selected>Select appointment type</option>
+            <option value="CONSULT">CONSULT</option>
+            <option value="PHYSICAL">PHYSICAL</option>
+            <option value="CHECKUP">CHECKUP</option>
+            <option value="PROCEDURE">PROCEDURE</option>
+          </select>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Create Appointment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Fetch doctors and populate the dropdown
+    async function fetchDoctors() {
+      try {
+        const response = await fetch('http://127.0.0.1:8080/api/users/doctors', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+          }
+        });
+
+        if (response.ok) {
+          const doctors = await response.json();
+          const doctorDropdown = document.getElementById('doctorId');
+
+          doctors.forEach(doctor => {
+            const option = document.createElement('option');
+            option.value = doctor.id;
+            option.textContent = `${doctor.username}`;
+            doctorDropdown.appendChild(option);
+          });
+        } else {
+          const errorText = await response.text();
+          console.error('Error fetching doctors:', response.status, errorText);
+          alert(`Failed to load doctors. Error: ${errorText}`);
+        }
+      } catch (err) {
+        console.error('Error fetching doctors:', err);
+        alert('An error occurred while fetching doctors.');
+      }
+    }
+
+    // Set up the form submission
+    document.getElementById('appointment-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const patientId = localStorage.getItem('loggedInUserId');
+      if (!patientId) {
+        alert('You must be logged in to create an appointment.');
+        return;
+      }
+
+      const data = {
+        dateTime: document.getElementById('dateTime').value,
+        appointmentType: document.getElementById('type').value, // Get the selected appointment type
+        status: 'SCHEDULED',
+        patientId: parseInt(patientId),
+        doctorId: parseInt(document.getElementById('doctorId').value)
+      };
+
+      try {
+        const response = await fetch('http://localhost:8080/api/appointments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          alert('Appointment created successfully!');
+          window.location.href = 'index.html';
+        } else {
+          const error = await response.text();
+          alert('Error: ' + error);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('An error occurred. Please try again.');
+      }
+    });
+
+    // Fetch doctors on page load
+    document.addEventListener('DOMContentLoaded', fetchDoctors);
+  </script>
+</body>
+
+</html>
