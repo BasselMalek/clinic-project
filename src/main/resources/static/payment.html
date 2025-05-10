@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clinic Payment System</title>
+  <style>
+    :root {
+      --primary-color: #2e86de;
+      --background: #f7f9fc;
+      --card-bg: #ffffff;
+      --border: #dcdde1;
+      --success: #27ae60;
+      --error: #e74c3c;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--background);
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+    }
+
+    .section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1b4f72;
+    }
+
+    pre {
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+
+    p {
+      font-weight: bold;
+    }
+
+    .success {
+      color: var(--success);
+    }
+
+    .error {
+      color: var(--error);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Clinic Payment System</h1>
+
+  <!-- Register Payment Method -->
+  <div class="section">
+    <h3>Register Payment Method</h3>
+    <input type="number" id="regPatientId" placeholder="Patient ID" />
+    <input type="text" id="methodName" placeholder="Payment Method (e.g. Credit Card)" />
+    <button onclick="registerMethod()">Register</button>
+    <p id="registerMsg"></p>
+  </div>
+
+  <!-- Get Methods By Patient ID -->
+  <div class="section">
+    <h3>Get Methods by Patient ID</h3>
+    <input type="number" id="getPatientId" placeholder="Patient ID" />
+    <button onclick="getMethodsByPatient()">Get Methods</button>
+    <pre id="methodList"></pre>
+  </div>
+
+  <!-- Get Method by Method ID -->
+  <div class="section">
+    <h3>Get Method by Method ID</h3>
+    <input type="number" id="methodIdLookup" placeholder="Method ID" />
+    <button onclick="getMethodById()">Get Method</button>
+    <pre id="methodDetails"></pre>
+  </div>
+
+  <!-- Recharge -->
+  <div class="section">
+    <h3>Recharge Method</h3>
+    <input type="number" id="rechargeMethodId" placeholder="Method ID" />
+    <input type="number" id="rechargeAmount" placeholder="Amount to Recharge" />
+    <button onclick="recharge()">Recharge</button>
+    <p id="rechargeMsg"></p>
+  </div>
+
+  <!-- Pay -->
+  <div class="section">
+    <h3>Make Payment</h3>
+    <input type="number" id="payPatientId" placeholder="Patient ID" />
+    <input type="number" id="payMethodId" placeholder="Payment Method ID" />
+    <input type="number" id="payAmount" placeholder="Amount to Pay" />
+    <button onclick="pay()">Pay</button>
+    <p id="payMsg"></p>
+  </div>
+
+  <script>
+    const baseUrl = "http://127.0.0.1:8080/api/payments";
+
+    async function registerMethod() {
+      const patientId = document.getElementById("regPatientId").value;
+      const name = document.getElementById("methodName").value;
+      const res = await fetch(`${baseUrl}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patientId, name })
+      });
+      document.getElementById("registerMsg").innerText = res.ok ? "✅ Registered!" : "❌ Failed to register";
+      document.getElementById("registerMsg").className = res.ok ? "success" : "error";
+    }
+
+    async function getMethodsByPatient() {
+      const id = document.getElementById("getPatientId").value;
+      const res = await fetch(`${baseUrl}/method/${id}`);
+      const data = await res.json();
+      document.getElementById("methodList").innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function getMethodById() {
+      const id = document.getElementById("methodIdLookup").value;
+      const res = await fetch(`${baseUrl}/method/${id}`);
+      const data = await res.json();
+      document.getElementById("methodDetails").innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function recharge() {
+      const methodId = document.getElementById("rechargeMethodId").value;
+      const amount = document.getElementById("rechargeAmount").value;
+      const res = await fetch(`${baseUrl}/recharge/${methodId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount })
+      });
+      document.getElementById("rechargeMsg").innerText = res.ok ? "✅ Recharge successful!" : "❌ Recharge failed";
+      document.getElementById("rechargeMsg").className = res.ok ? "success" : "error";
+    }
+
+    async function pay() {
+      const patientId = document.getElementById("payPatientId").value;
+      const paymentMethodId = document.getElementById("payMethodId").value;
+      const amount = document.getElementById("payAmount").value;
+      const res = await fetch(`${baseUrl}/pay/${paymentMethodId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patientId, paymentMethodId, amount })
+      });
+      document.getElementById("payMsg").innerText = res.ok ? "✅ Payment successful!" : "❌ Payment failed";
+      document.getElementById("payMsg").className = res.ok ? "success" : "error";
+    }
+  </script>
+</body>
+</html>
