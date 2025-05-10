@@ -7,6 +7,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/clinic?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/clinic?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 
+      SPRING_DATASOURCE_PASSWORD: rootpassword  # Set a password here
+
+  db:
+    image: mysql:8.0  # Use the latest MySQL image
+    container_name: mysql-db
+    ports:
+      - "3307:3306"  # Map host port 3307 to container port 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Set the root password
+      MYSQL_DATABASE: clinic  # Create the database on startup
+    volumes:
+      - db_data:/var/lib/mysql  # Persist data
+
+volumes:
+  db_data:
