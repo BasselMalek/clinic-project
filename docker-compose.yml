@@ -1,45 +1,12 @@
 version: "3.8"
 
 services:
-    db:
-        image: mysql:latest
-        container_name: db
-        ports:
-            - "3306:3306"
-        volumes:
-            - /var/lib/mysql_data:/var/lib/mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: 
-            MYSQL_DATABASE: clinic
-        restart: always
-        networks:
-            - clinic-network
-        deploy:
-            resources:
-                limits:
-                    cpus: "0.5"
-                    memory: 256M
-
-    clinic-service:
-        build: .
-        container_name: clinic-service
-        ports:
-            - "8080:8080"
-        environment:
-            SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/clinic_db?createDatabaseIfNotExist=true
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD: 
-        depends_on:
-            - db
-        restart: on-failure:2
-        networks:
-            - clinic-network
-        deploy:
-            resources:
-                limits:
-                    cpus: "0.5"
-                    memory: 256M
-
-networks:
-    clinic-network:
-        driver: bridge
+  clinic-service:
+    build: .
+    container_name: clinic-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/clinic?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 
