@@ -34,20 +34,24 @@
       font-weight: bold;
     }
 
-    .appointments-table {
+    .appointments-table,
+    .bills-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
 
     .appointments-table th,
-    .appointments-table td {
+    .appointments-table td,
+    .bills-table th,
+    .bills-table td {
       border: 1px solid navy;
       padding: 10px;
       text-align: left;
     }
 
-    .appointments-table th {
+    .appointments-table th,
+    .bills-table th {
       background-color: #f0f8ff;
       color: navy;
     }
@@ -67,7 +71,7 @@
       <!-- Profile details will be dynamically inserted here -->
     </div>
 
-    <!-- Appointments Table (Visible only for patients) -->
+    <!-- Appointments Table -->
     <div id="appointments-section" style="display: none;">
       <h2 class="profile-header">Appointments</h2>
       <table class="appointments-table" id="appointments-table">
@@ -86,8 +90,27 @@
       </table>
     </div>
 
+    <!-- Bills Table -->
+    <div id="bills-section" style="display: none;">
+      <h2 class="profile-header">Bills</h2>
+      <table class="bills-table" id="bills-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Issued Date</th>
+            <th>Status</th>
+            <th>Total Amount</th>
+            <th>Pay</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Bills will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </div>
+
     <!-- Staff Button -->
-    <div class="staff-button" id="staff-button" style="display: none;margin-top:60px;" >
+    <div class="staff-button" id="staff-button" style="display: none;margin-top:60px;">
       <button class="btn btn-primary" onclick="redirectToStaffPage()">Go to bill management page</button>
     </div>
 
@@ -97,142 +120,196 @@
   </div>
 
   <script>
-  // Display user profile data and fetch appointments
-  document.addEventListener('DOMContentLoaded', async function () {
-    const username = localStorage.getItem('loggedInUsername');
-    const email = localStorage.getItem('loggedInUserEmail');
-    const role = localStorage.getItem('loggedInUserRole');
-    const jwtToken = localStorage.getItem('jwtToken');
+    // Display user profile data and fetch appointments and bills
+    document.addEventListener('DOMContentLoaded', async function () {
+      const username = localStorage.getItem('loggedInUsername');
+      const email = localStorage.getItem('loggedInUserEmail');
+      const role = localStorage.getItem('loggedInUserRole');
+      const userId = localStorage.getItem('loggedInUserId');
+      const jwtToken = localStorage.getItem('jwtToken');
 
-    if (!username || !email || !role || !jwtToken) {
-      alert('You must be logged in to view this page.');
+      if (!username || !email || !role || !jwtToken) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'signin.html';
+        return;
+      }
+
+      // Display user profile details
+      const profileDetails = document.getElementById('profile-details');
+      profileDetails.innerHTML = `
+        <div class="profile-item"><span>Username:</span> ${username}</div>
+        <div class="profile-item"><span>Email:</span> ${email}</div>
+        <div class="profile-item"><span>Role:</span> ${role}</div>
+      `;
+
+      // Fetch appointments based on role
+      if (role === 'PATIENT') {
+        document.getElementById('appointments-section').style.display = 'block';
+        const apiUrl = `http://127.0.0.1:8080/api/appointments/patient/${username}`;
+        fetchAppointments(apiUrl, jwtToken, false);
+      } else if (role === 'DOCTOR') {
+        document.getElementById('appointments-section').style.display = 'block';
+        const apiUrl = `http://127.0.0.1:8080/api/appointments/doctor/${username}`;
+        fetchAppointments(apiUrl, jwtToken, true);
+      } else if (role === 'STAFF_MEMBER') {
+        document.getElementById('appointments-section').style.display = 'block';
+        const apiUrl = `http://127.0.0.1:8080/api/appointments`;
+        fetchAppointments(apiUrl, jwtToken, false);
+      }
+
+      // Fetch bills if userId is available
+      if (userId) {
+        document.getElementById('bills-section').style.display = 'block';
+        const billsApiUrl = `http://127.0.0.1:8080/api/billing/user/${userId}`;
+        fetchBills(billsApiUrl, jwtToken);
+      }
+
+      // Show staff button if the user is a staff member
+      if (role === 'STAFF_MEMBER') {
+        document.getElementById('staff-button').style.display = 'block';
+      }
+    });
+
+    // Fetch appointments and display them
+    async function fetchAppointments(apiUrl, jwtToken, isDoctor) {
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
+
+        if (response.ok) {
+          const appointments = await response.json();
+          displayAppointments(appointments, isDoctor);
+        } else {
+          alert('Failed to fetch appointments.');
+        }
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+        alert('An error occurred while fetching appointments.');
+      }
+    }
+
+    // Display appointments in the table
+    function displayAppointments(appointments, isDoctor) {
+      const appointmentsTableBody = document.querySelector('#appointments-table tbody');
+      appointmentsTableBody.innerHTML = appointments.map(appointment => `
+        <tr>
+          <td>${appointment.id}</td>
+          <td>${appointment.doctor.username}</td>
+          <td>${appointment.dateTime}</td>
+          <td>${appointment.type || 'N/A'}</td>
+          <td>
+            ${isDoctor ? getStatusDropdown(appointment.id, appointment.status) : appointment.status}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Generate a status dropdown for doctors
+    function getStatusDropdown(appointmentId, currentStatus) {
+      const statuses = ['SCHEDULED', 'ATTENDED', 'MISSED', 'CANCELED'];
+      return `
+        <select class="form-control" onchange="updateAppointmentStatus(${appointmentId}, this.value)">
+          ${statuses.map(status => `
+            <option value="${status}" ${status === currentStatus ? 'selected' : ''}>${status}</option>
+          `).join('')}
+        </select>
+      `;
+    }
+
+    // Update the status of an appointment
+    async function updateAppointmentStatus(appointmentId, newStatus) {
+      const jwtToken = localStorage.getItem('jwtToken');
+      const apiUrl = `http://127.0.0.1:8080/api/appointments/${appointmentId}/status?status=${newStatus}`;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
+
+        if (response.ok) {
+          alert('Appointment status updated successfully!');
+        } else {
+          const error = await response.text();
+          alert('Failed to update status: ' + error);
+        }
+      } catch (err) {
+        console.error('Error updating appointment status:', err);
+        alert('An error occurred while updating the appointment status.');
+      }
+    }
+
+    // Fetch bills and display them
+    async function fetchBills(apiUrl, jwtToken) {
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
+
+        if (response.ok) {
+          const bills = await response.json();
+          displayBills(bills);
+        } else {
+          alert('Failed to fetch bills.');
+        }
+      } catch (err) {
+        console.error('Error fetching bills:', err);
+        alert('An error occurred while fetching bills.');
+      }
+    }
+    // Display bills in the table
+    function displayBills(bills, userRole) {
+      const billsTableBody = document.querySelector('#bills-table tbody');
+      billsTableBody.innerHTML = bills.map(bill => `
+    <tr>
+      <td>${bill.id}</td>
+      <td>${new Date(bill.issuedDate).toLocaleString()}</td>
+      <td>${bill.status}</td>
+      <td>${bill.totalAmount.toFixed(2)} USD</td>
+      <td>
+        ${userRole === 'PATIENT' && bill.status === 'UNPAID'
+          ? `<button class="btn btn-primary" onclick="redirectToPayment(${bill.id})">Pay</button>`
+          : 'N/A'}
+      </td>
+    </tr>
+  `).join('');
+    }
+
+    // Redirect to payment page
+    function redirectToPayment(billId) {
+      // Store the bill ID in local storage or handle it as needed
+      localStorage.setItem('currentBillId', billId);
+      window.location.href = 'payment.html';
+    }
+
+
+    // Redirect to staff page
+    function redirectToStaffPage() {
+      window.location.href = 'staff-member.html';
+    }
+
+    // Logout function
+    function logout() {
+      // Remove JWT token and user data from localStorage
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem('loggedInUserId');
+      localStorage.removeItem('loggedInUsername');
+      localStorage.removeItem('loggedInUserEmail');
+      localStorage.removeItem('loggedInUserRole');
+
+      // Redirect to the login page
       window.location.href = 'signin.html';
-      return;
     }
-
-    // Display user profile details
-    const profileDetails = document.getElementById('profile-details');
-    profileDetails.innerHTML = `
-      <div class="profile-item"><span>Username:</span> ${username}</div>
-      <div class="profile-item"><span>Email:</span> ${email}</div>
-      <div class="profile-item"><span>Role:</span> ${role}</div>
-    `;
-
-    // Fetch appointments based on role
-    if (role === 'PATIENT') {
-      document.getElementById('appointments-section').style.display = 'block';
-      const apiUrl = `http://127.0.0.1:8080/api/appointments/patient/${username}`;
-      fetchAppointments(apiUrl, jwtToken, false);
-    } else if (role === 'DOCTOR') {
-      document.getElementById('appointments-section').style.display = 'block';
-      const apiUrl = `http://127.0.0.1:8080/api/appointments/doctor/${username}`;
-      fetchAppointments(apiUrl, jwtToken, true);
-    }
-    else if (role === 'STAFF_MEMBER') {
-      document.getElementById('appointments-section').style.display = 'block';
-      const apiUrl = `http://127.0.0.1:8080/api/appointments`;
-      fetchAppointments(apiUrl, jwtToken, false);
-    }
-
-    // Show staff button if the user is a staff member
-    if (role === 'STAFF_MEMBER') {
-      document.getElementById('staff-button').style.display = 'block';
-    }
-  });
-
-  // Fetch appointments and display them
-  async function fetchAppointments(apiUrl, jwtToken, isDoctor) {
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${jwtToken}`
-        }
-      });
-
-      if (response.ok) {
-        const appointments = await response.json();
-        displayAppointments(appointments, isDoctor);
-      } else {
-        alert('Failed to fetch appointments.');
-      }
-    } catch (err) {
-      console.error('Error fetching appointments:', err);
-      alert('An error occurred while fetching appointments.');
-    }
-  }
-
-  // Display appointments in the table
-  function displayAppointments(appointments, isDoctor) {
-    const appointmentsTableBody = document.querySelector('#appointments-table tbody');
-    appointmentsTableBody.innerHTML = appointments.map(appointment => `
-      <tr>
-        <td>${appointment.id}</td>
-        <td>${appointment.doctor.username}</td>
-        <td>${appointment.dateTime}</td>
-        <td>${appointment.type || 'N/A'}</td>
-        <td>
-          ${isDoctor ? getStatusDropdown(appointment.id, appointment.status) : appointment.status}
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  // Generate a status dropdown for doctors
-  function getStatusDropdown(appointmentId, currentStatus) {
-    const statuses = ['SCHEDULED', 'ATTENDED', 'MISSED', 'CANCELED'];
-    return `
-      <select class="form-control" onchange="updateAppointmentStatus(${appointmentId}, this.value)">
-        ${statuses.map(status => `
-          <option value="${status}" ${status === currentStatus ? 'selected' : ''}>${status}</option>
-        `).join('')}
-      </select>
-    `;
-  }
-
-  // Update the status of an appointment
-  async function updateAppointmentStatus(appointmentId, newStatus) {
-    const jwtToken = localStorage.getItem('jwtToken');
-    const apiUrl = `http://127.0.0.1:8080/api/appointments/${appointmentId}/status?status=${newStatus}`;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${jwtToken}`
-        }
-      });
-
-      if (response.ok) {
-        alert('Appointment status updated successfully!');
-      } else {
-        const error = await response.text();
-        alert('Failed to update status: ' + error);
-      }
-    } catch (err) {
-      console.error('Error updating appointment status:', err);
-      alert('An error occurred while updating the appointment status.');
-    }
-  }
-
-  // Redirect to staff page
-  function redirectToStaffPage() {
-    window.location.href = 'staff-member.html';
-  }
-
-  // Logout function
-  function logout() {
-    // Remove JWT token and user data from localStorage
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('loggedInUserId');
-    localStorage.removeItem('loggedInUsername');
-    localStorage.removeItem('loggedInUserEmail');
-    localStorage.removeItem('loggedInUserRole');
-
-    // Redirect to the login page
-    window.location.href = 'signin.html';
-  }
-</script>
+  </script>
 </body>
 
 </html>

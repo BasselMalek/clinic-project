@@ -24,14 +24,14 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public JwtResponse authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username);
+    public JwtResponse authenticate(String email, String password) {
+        User user = userRepository.findByemail(email);
 
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException("Invalid username or password");
         }
 
-        String token = jwtUtil.generateToken(username);
+        String token = jwtUtil.generateToken(email);
 
         return new JwtResponse(token, user.getId(), user.getUsername(), user.getEmail(), user.getRole().name());
     }

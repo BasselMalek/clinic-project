@@ -13,4 +13,5 @@ import com.clinic.project.Domain.Model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     List<User> findByRole(Role role);
+    User findByemail(String email);
 }
