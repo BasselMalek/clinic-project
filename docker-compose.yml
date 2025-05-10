@@ -6,20 +6,10 @@ services:
         container_name: db
         ports:
             - "3306:3306"
-        volumes:
-            - /mnt/mysql-data:/var/lib/mysql
         environment:
-            MYSQL_ALLOW_EMPTY_PASSWORD: true
-            MYSQL_ROOT_PASSWORD:
+            MYSQL_ROOT_PASSWORD: test
             MYSQL_DATABASE: clinic
         restart: always
-        stdin_open: false
-        tty: false
-        deploy:
-            resources:
-                limits:
-                    cpus: "0.5"
-                    memory: 256M
 
     clinic-service:
         build: .
@@ -29,7 +19,7 @@ services:
         environment:
             SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/clinic?createDatabaseIfNotExist=true
             SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD:
+            SPRING_DATASOURCE_PASSWORD: test
         depends_on:
             - db
         restart: on-failure:2
