@@ -1,5 +1,22 @@
 version: "3.8"
+
 services:
+    db:
+        image: mysql:latest
+        container_name: db
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQLDATABASE}
+            MYSQL_USER: ${MYSQLUSER}
+            MYSQL_PASSWORD: ${MYSQLPASSWORD}
+        volumes:
+            - /var/lib/mysql_data:/var/lib/mysql
+        restart: always
+        networks:
+            - clinic-network
+
     clinic-service:
         build: .
         container_name: clinic-service
@@ -9,3 +26,12 @@ services:
             SPRING_DATASOURCE_URL: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?createDatabaseIfNotExist=true
             SPRING_DATASOURCE_USERNAME: ${MYSQLUSER}
             SPRING_DATASOURCE_PASSWORD: ${MYSQLPASSWORD}
+        depends_on:
+            - db
+        restart: always
+        networks:
+            - clinic-network
+
+networks:
+    clinic-network:
+        driver: bridge
