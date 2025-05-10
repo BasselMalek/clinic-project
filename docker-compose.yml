@@ -1,5 +1,12 @@
 version: '3.8'
 services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: testing
   clinic-service:
     build: .
     container_name: clinic-service
@@ -8,4 +15,4 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/clinic?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 
+      SPRING_DATASOURCE_PASSWORD: testing
