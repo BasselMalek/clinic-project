@@ -36,5 +36,18 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+   
+   public String changeUserRole(Long userId, String newRole) {
+      
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+           
+            user.setRole(Role.valueOf(newRole));
+          
+            userRepository.save(user);
+            return "Role changed ";
+        }
+        return "Failed to change role";
+    }
  
 }

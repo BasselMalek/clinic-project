@@ -1,20 +1,15 @@
 package com.clinic.project.Adapters.Controllers;
 
+import com.clinic.project.Adapters.Dto.RoleChangeDTO;
+import com.clinic.project.Domain.Model.Role;
 import com.clinic.project.Domain.Model.User;
 import com.clinic.project.Domain.Services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import javax.management.relation.Role;
-
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,7 +18,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
 
     @PostMapping
     public User createUser(@RequestBody User user) {
@@ -39,11 +33,22 @@ public class UserController {
     public User getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsername(username);
     }
-    
+
     @GetMapping("/doctors")
     public List<User> getDoctors() {
         userService.getDoctors().forEach(user -> user.setPassword(null));
         return userService.getDoctors();
+    }
+
+
+    @PutMapping("/{userId}/role")
+    public String changeUserRole(@PathVariable Long userId, @RequestBody RoleChangeDTO roleChangeDTO) {
+        try {
+            userService.changeUserRole(userId, roleChangeDTO.getRole());
+            return "User role updated successfully.";
+        } catch (Exception e) {
+            return "Error updating user role: " + e.getMessage();
+        }
     }
 
 }
