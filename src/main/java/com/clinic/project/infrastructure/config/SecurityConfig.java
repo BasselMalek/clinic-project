@@ -26,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Enable CORS
         //         .authorizeHttpRequests(auth -> auth
         //                 // Allow unauthenticated access to static content
         //                 .requestMatchers("/static/**", "/public/**", "/resources/**", "/favicon.ico").permitAll()
