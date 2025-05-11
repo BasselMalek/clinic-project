@@ -1,13 +1,13 @@
 package com.clinic.project.Adapters.Controllers;
 
+import com.clinic.project.Adapters.Dto.PayBillRequest;
+import com.clinic.project.Adapters.Dto.RechargeBalanceRequest;
+import com.clinic.project.Adapters.Dto.RegisterPaymentMethodRequest;
 import com.clinic.project.Domain.Model.Bill;
 import com.clinic.project.Domain.Model.BillStatus;
 import com.clinic.project.Domain.Model.PaymentMethod;
 import com.clinic.project.Domain.Services.BillingService;
 import com.clinic.project.Domain.Services.PaymentService;
-import com.clinic.project.infrastructure.Dto.PayBillRequest;
-import com.clinic.project.infrastructure.Dto.RechargeBalanceRequest;
-import com.clinic.project.infrastructure.Dto.RegisterPaymentMethodRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.clinic.project.infrastructure.Dto;
+package com.clinic.project.Adapters.Dto;
 
 import com.clinic.project.Domain.Model.AppointmentStatus;
 import com.clinic.project.Domain.Model.AppointmentType;
