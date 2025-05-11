@@ -1,12 +1,12 @@
 package com.clinic.project.Adapters.Controllers;
 
+import com.clinic.project.Adapters.Dto.AppointmentRequestDto;
 import com.clinic.project.Domain.Model.Appointment;
 import com.clinic.project.Domain.Model.AppointmentStatus;
 import com.clinic.project.Domain.Model.AppointmentType;
 import com.clinic.project.Domain.Model.User;
 import com.clinic.project.Domain.Services.AppointmentService;
 import com.clinic.project.Domain.Services.UserService;
-import com.clinic.project.infrastructure.Dto.AppointmentRequestDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

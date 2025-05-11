@@ -9,6 +9,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import javax.management.relation.Role;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
@@ -38,4 +45,5 @@ public class UserController {
         userService.getDoctors().forEach(user -> user.setPassword(null));
         return userService.getDoctors();
     }
+
 }

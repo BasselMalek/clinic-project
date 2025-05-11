@@ -101,91 +101,248 @@
 
   <!-- Get Methods By Patient ID -->
   <div class="section">
-    <h3>Get Methods by Patient ID</h3>
+    <h3>Get Method by Patient ID</h3>
     <input type="number" id="getPatientId" placeholder="Patient ID" />
-    <button onclick="getMethodsByPatient()">Get Methods</button>
+    <button onclick="getMethodsByPatient()">Get Method</button>
     <pre id="methodList"></pre>
   </div>
 
   <!-- Get Method by Method ID -->
   <div class="section">
-    <h3>Get Method by Method ID</h3>
+    <h3>Check Balance by Method ID</h3>
     <input type="number" id="methodIdLookup" placeholder="Method ID" />
-    <button onclick="getMethodById()">Get Method</button>
+    <button onclick="checkBalance()">Check Balance</button>
     <pre id="methodDetails"></pre>
   </div>
 
-  <!-- Recharge -->
+  <!-- Recharge Payment Method -->
   <div class="section">
-    <h3>Recharge Method</h3>
+    <h3>Recharge Payment Method</h3>
     <input type="number" id="rechargeMethodId" placeholder="Method ID" />
-    <input type="number" id="rechargeAmount" placeholder="Amount to Recharge" />
+    <input type="number" id="rechargeAmount" placeholder="Amount" step="0.01" />
     <button onclick="recharge()">Recharge</button>
     <p id="rechargeMsg"></p>
   </div>
 
-  <!-- Pay -->
+  <!-- Pay Bill -->
   <div class="section">
-    <h3>Make Payment</h3>
-    <input type="number" id="payPatientId" placeholder="Patient ID" />
+    <h3>Pay Bill</h3>
+    <input type="number" id="billId" placeholder="Bill ID" />
     <input type="number" id="payMethodId" placeholder="Payment Method ID" />
-    <input type="number" id="payAmount" placeholder="Amount to Pay" />
-    <button onclick="pay()">Pay</button>
+    <button onclick="pay()">Pay Bill</button>
     <p id="payMsg"></p>
   </div>
-
+  
+  <!-- Authentication -->
+  <!-- <div class="section">
+    <h3>Authentication Status</h3>
+    <div id="authStatus"></div>
+    
+    <h4>Manual Token Entry</h4>
+    <input type="text" id="authToken" placeholder="JWT Token" />
+    <button onclick="saveAuthToken()">Save Token</button>
+    <p id="tokenMsg"></p> -->
+    
+    <script>
+      // Load token and user info on page load if it exists
+      document.addEventListener('DOMContentLoaded', function() {
+        updateAuthStatus();
+      });
+      
+      function updateAuthStatus() {
+        const authStatus = document.getElementById('authStatus');
+        const token = localStorage.getItem('jwtToken');
+        const userId = localStorage.getItem('loggedInUserId');
+        const username = localStorage.getItem('loggedInUsername');
+        const email = localStorage.getItem('loggedInUserEmail');
+        const role = localStorage.getItem('loggedInUserRole');
+        
+        if (token && username) {
+          authStatus.innerHTML = `
+            <div class="success">✅ Authenticated</div>
+            <p><strong>User:</strong> ${username}</p>
+            <p><strong>Email:</strong> ${email || 'N/A'}</p>
+            <p><strong>ID:</strong> ${userId || 'N/A'}</p>
+            <p><strong>Role:</strong> ${role || 'N/A'}</p>
+            <button onclick="logout()">Logout</button>
+          `;
+          
+          // Set token in the input field
+          document.getElementById('authToken').value = token;
+        } else {
+          authStatus.innerHTML = `
+            <div class="error">❌ Not authenticated</div>
+            <p>Please login or enter your JWT token manually below.</p>
+          `;
+        }
+      }
+      
+      function saveAuthToken() {
+        const token = document.getElementById('authToken').value;
+        if (token) {
+          localStorage.setItem('jwtToken', token);
+          // Set placeholder values for missing user data
+          if (!localStorage.getItem('loggedInUserId')) {
+            localStorage.setItem('loggedInUserId', 'unknown');
+          }
+          if (!localStorage.getItem('loggedInUsername')) {
+            localStorage.setItem('loggedInUsername', 'Manual Token User');
+          }
+          
+          document.getElementById('tokenMsg').innerText = "✅ Token saved to local storage";
+          document.getElementById('tokenMsg').className = "success";
+          updateAuthStatus();
+        } else {
+          document.getElementById('tokenMsg').innerText = "❌ Please enter a token";
+          document.getElementById('tokenMsg').className = "error";
+        }
+      }
+      
+      function logout() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('loggedInUserId');
+        localStorage.removeItem('loggedInUsername');
+        localStorage.removeItem('loggedInUserEmail');
+        localStorage.removeItem('loggedInUserRole');
+        updateAuthStatus();
+        document.getElementById('tokenMsg').innerText = "✅ Logged out successfully";
+        document.getElementById('tokenMsg').className = "success";
+      }
+    </script>
+  </div>
+  
   <script>
     const baseUrl = "http://127.0.0.1:8080/api/payments";
 
+    // Helper function to get auth token from localStorage
+    function getAuthToken() {
+      return localStorage.getItem('jwtToken');
+    }
+
+    // Helper function to create headers with auth token
+    function createHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      };
+    }
+
     async function registerMethod() {
-      const patientId = document.getElementById("regPatientId").value;
+      const patientId = parseInt(document.getElementById("regPatientId").value);
       const name = document.getElementById("methodName").value;
-      const res = await fetch(`${baseUrl}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ patientId, name })
-      });
-      document.getElementById("registerMsg").innerText = res.ok ? "✅ Registered!" : "❌ Failed to register";
-      document.getElementById("registerMsg").className = res.ok ? "success" : "error";
+      
+      try {
+        const res = await fetch(`${baseUrl}/register`, {
+          method: "POST",
+          headers: createHeaders(),
+          body: JSON.stringify({
+            patientId: patientId,
+            name: name
+          })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("registerMsg").innerText = `✅ Registered! Method ID: ${data.id}`;
+          document.getElementById("registerMsg").className = "success";
+        } else {
+          const errorData = await res.text();
+          document.getElementById("registerMsg").innerText = `❌ Failed to register: ${errorData}`;
+          document.getElementById("registerMsg").className = "error";
+        }
+      } catch (err) {
+        document.getElementById("registerMsg").innerText = `❌ Error: ${err.message}`;
+        document.getElementById("registerMsg").className = "error";
+      }
     }
 
     async function getMethodsByPatient() {
       const id = document.getElementById("getPatientId").value;
-      const res = await fetch(`${baseUrl}/method/${id}`);
-      const data = await res.json();
-      document.getElementById("methodList").innerText = JSON.stringify(data, null, 2);
+      try {
+        const res = await fetch(`http://127.0.0.1:8080/api/payments/method/${id}`, {
+          headers: createHeaders()
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("methodList").innerText = JSON.stringify(data, null, 2);
+        } else {
+          document.getElementById("methodList").innerText = `Error: Payment method not found`;
+        }
+      } catch (err) {
+        document.getElementById("methodList").innerText = `Error: ${err.message}`;
+      }
     }
 
-    async function getMethodById() {
+    async function checkBalance() {
       const id = document.getElementById("methodIdLookup").value;
-      const res = await fetch(`${baseUrl}/method/${id}`);
-      const data = await res.json();
-      document.getElementById("methodDetails").innerText = JSON.stringify(data, null, 2);
+      try {
+        const res = await fetch(`${baseUrl}/balance/${id}`, {
+          headers: createHeaders()
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("methodDetails").innerText = JSON.stringify(data, null, 2);
+        } else {
+          document.getElementById("methodDetails").innerText = `Error: Payment method not found`;
+        }
+      } catch (err) {
+        document.getElementById("methodDetails").innerText = `Error: ${err.message}`;
+      }
     }
 
     async function recharge() {
       const methodId = document.getElementById("rechargeMethodId").value;
       const amount = document.getElementById("rechargeAmount").value;
-      const res = await fetch(`${baseUrl}/recharge/${methodId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount })
-      });
-      document.getElementById("rechargeMsg").innerText = res.ok ? "✅ Recharge successful!" : "❌ Recharge failed";
-      document.getElementById("rechargeMsg").className = res.ok ? "success" : "error";
+      
+      try {
+        const res = await fetch(`${baseUrl}/recharge/${methodId}`, {
+          method: "POST",
+          headers: createHeaders(),
+          body: JSON.stringify({
+            amount: amount
+          })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("rechargeMsg").innerText = `✅ Recharge successful! New balance: ${data.balance}`;
+          document.getElementById("rechargeMsg").className = "success";
+        } else {
+          document.getElementById("rechargeMsg").innerText = `❌ Recharge failed: Insufficient funds or invalid method`;
+          document.getElementById("rechargeMsg").className = "error";
+        }
+      } catch (err) {
+        document.getElementById("rechargeMsg").innerText = `❌ Error: ${err.message}`;
+        document.getElementById("rechargeMsg").className = "error";
+      }
     }
 
     async function pay() {
-      const patientId = document.getElementById("payPatientId").value;
-      const paymentMethodId = document.getElementById("payMethodId").value;
-      const amount = document.getElementById("payAmount").value;
-      const res = await fetch(`${baseUrl}/pay/${paymentMethodId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ patientId, paymentMethodId, amount })
-      });
-      document.getElementById("payMsg").innerText = res.ok ? "✅ Payment successful!" : "❌ Payment failed";
-      document.getElementById("payMsg").className = res.ok ? "success" : "error";
+      const billId = document.getElementById("billId").value;
+      const paymentMethodId = parseInt(document.getElementById("payMethodId").value);
+      
+      try {
+        const res = await fetch(`${baseUrl}/pay/${billId}`, {
+          method: "POST",
+          headers: createHeaders(),
+          body: JSON.stringify({
+            paymentMethodId: paymentMethodId
+          })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("payMsg").innerText = `✅ Payment successful! Remaining balance: ${data.balance}`;
+          document.getElementById("payMsg").className = "success";
+        } else {
+          const errorText = await res.text();
+          document.getElementById("payMsg").innerText = `❌ Payment failed: ${errorText}`;
+          document.getElementById("payMsg").className = "error";
+        }
+      } catch (err) {
+        document.getElementById("payMsg").innerText = `❌ Error: ${err.message}`;
+        document.getElementById("payMsg").className = "error";
+      }
     }
   </script>
 </body>

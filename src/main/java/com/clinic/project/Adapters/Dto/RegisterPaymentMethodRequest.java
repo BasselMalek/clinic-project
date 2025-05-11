@@ -1,4 +1,4 @@
-package com.clinic.project.infrastructure.Dto;
+package com.clinic.project.Adapters.Dto;
 
 public class RegisterPaymentMethodRequest {
     private long patientId;

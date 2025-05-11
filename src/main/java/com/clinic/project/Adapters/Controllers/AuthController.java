@@ -1,9 +1,9 @@
 
 package com.clinic.project.Adapters.Controllers;
 
+import com.clinic.project.Adapters.Dto.AuthRequest;
 import com.clinic.project.Domain.Model.JwtResponse;
 import com.clinic.project.Domain.Services.AuthenticationService;
-import com.clinic.project.infrastructure.Dto.AuthRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
