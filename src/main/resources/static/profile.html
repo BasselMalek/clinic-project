@@ -145,22 +145,22 @@
       // Fetch appointments based on role
       if (role === 'PATIENT') {
         document.getElementById('appointments-section').style.display = 'block';
-        const apiUrl = `http://127.0.0.1:8080/api/appointments/patient/${username}`;
+        const apiUrl = `http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/appointments/patient/${username}`;
         fetchAppointments(apiUrl, jwtToken, false);
       } else if (role === 'DOCTOR') {
         document.getElementById('appointments-section').style.display = 'block';
-        const apiUrl = `http://127.0.0.1:8080/api/appointments/doctor/${username}`;
+        const apiUrl = `http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/appointments/doctor/${username}`;
         fetchAppointments(apiUrl, jwtToken, true);
       } else if (role === 'STAFF_MEMBER') {
         document.getElementById('appointments-section').style.display = 'block';
-        const apiUrl = `http://127.0.0.1:8080/api/appointments`;
+        const apiUrl = `http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/appointments`;
         fetchAppointments(apiUrl, jwtToken, false);
       }
 
       // Fetch bills if userId is available
       if (userId) {
         document.getElementById('bills-section').style.display = 'block';
-        const billsApiUrl = `http://127.0.0.1:8080/api/billing/user/${userId}`;
+        const billsApiUrl = `http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/billing/user/${userId}`;
         fetchBills(billsApiUrl, jwtToken);
       }
 
@@ -223,7 +223,7 @@
     // Update the status of an appointment
     async function updateAppointmentStatus(appointmentId, newStatus) {
       const jwtToken = localStorage.getItem('jwtToken');
-      const apiUrl = `http://127.0.0.1:8080/api/appointments/${appointmentId}/status?status=${newStatus}`;
+      const apiUrl = `http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/appointments/${appointmentId}/status?status=${newStatus}`;
 
       try {
         const response = await fetch(apiUrl, {

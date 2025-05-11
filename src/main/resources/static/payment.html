@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Clinic Payment System</title>
@@ -32,7 +33,7 @@
       border-radius: 10px;
       padding: 20px;
       margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       max-width: 500px;
       margin-left: auto;
       margin-right: auto;
@@ -43,7 +44,8 @@
       color: var(--primary-color);
     }
 
-    input, button {
+    input,
+    button {
       display: block;
       width: 100%;
       padding: 10px;
@@ -86,6 +88,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <h1>Clinic Payment System</h1>
@@ -135,7 +138,7 @@
   </div>
 
   <script>
-    const baseUrl = "http://127.0.0.1:8080/api/payments";
+    const baseUrl = "http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/payments";
 
     async function registerMethod() {
       const patientId = document.getElementById("regPatientId").value;
@@ -189,4 +192,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -44,7 +44,7 @@
     // Fetch doctors and populate the dropdown
     async function fetchDoctors() {
       try {
-        const response = await fetch('http://127.0.0.1:8080/api/users/doctors', {
+        const response = await fetch('http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/users/doctors', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
