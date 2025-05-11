@@ -23,19 +23,19 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //     http.csrf(csrf -> csrf.disable())
-    //             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-    //             .authorizeHttpRequests(auth -> auth
-    //                     .requestMatchers("/api/auth/**").permitAll()
-    //                     .requestMatchers("public/**","/resources/**", "/static/**").permitAll()
-    //                     .anyRequest().authenticated())
-    //             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    //     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("public/**","/resources/**", "/static/**").permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-    //     return http.build();
-    // }
+        return http.build();
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
