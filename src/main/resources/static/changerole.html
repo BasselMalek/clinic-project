@@ -98,7 +98,7 @@
             // Retrieve the JWT token from local storage (or wherever you store it)
             const token = localStorage.getItem('jwtToken'); // Adjust as necessary
 
-            fetch(`http://localhost:8080/api/users/${userId}/role`, {
+            fetch(`http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/users/${userId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
