@@ -1,0 +1,9 @@
+POST http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/billing/bills
+
+Content-Type: application/json
+
+{
+  "Username": "john_doe",
+  "rawPassword": "password123",
+  "Email": "john@example.com"
+}

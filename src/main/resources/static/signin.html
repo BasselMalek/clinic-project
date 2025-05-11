@@ -32,50 +32,50 @@
     </div>
   </div>
   <script>
-  document.getElementById('login-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-    // Collect form data
-    const data = {
-      email: document.getElementById('email').value,
-      password: document.getElementById('password').value
-    };
+      // Collect form data
+      const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      };
 
-    try {
-      // Send login request to the backend
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
+      try {
+        // Send login request to the backend
+        const response = await fetch('http://ec2-13-60-59-186.eu-north-1.compute.amazonaws.com:8080/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
 
-      if (response.ok) {
-        // Parse the response
-        const result = await response.json();
+        if (response.ok) {
+          // Parse the response
+          const result = await response.json();
 
-        // Save user details and token in localStorage
-        localStorage.setItem('jwtToken', result.token);
-        localStorage.setItem('loggedInUserId', result.id);
-        localStorage.setItem('loggedInUsername', result.username);
-        localStorage.setItem('loggedInUserEmail', result.email);
-        localStorage.setItem('loggedInUserRole', result.role);
+          // Save user details and token in localStorage
+          localStorage.setItem('jwtToken', result.token);
+          localStorage.setItem('loggedInUserId', result.id);
+          localStorage.setItem('loggedInUsername', result.username);
+          localStorage.setItem('loggedInUserEmail', result.email);
+          localStorage.setItem('loggedInUserRole', result.role);
 
-        alert('Login successful!');
-        window.location.href = 'index.html'; // Redirect to the home page
-      } else {
-        // Handle errors
-        const error = await response.text();
-        alert('Error: ' + error);
+          alert('Login successful!');
+          window.location.href = 'index.html'; // Redirect to the home page
+        } else {
+          // Handle errors
+          const error = await response.text();
+          alert('Error: ' + error);
+        }
+      } catch (err) {
+        // Handle unexpected errors
+        console.error('Error:', err);
+        alert('An error occurred. Please try again.');
       }
-    } catch (err) {
-      // Handle unexpected errors
-      console.error('Error:', err);
-      alert('An error occurred. Please try again.');
-    }
-  });
-</script>
+    });
+  </script>
 
 </body>
 
