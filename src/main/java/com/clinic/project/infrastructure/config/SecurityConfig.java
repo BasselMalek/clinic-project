@@ -27,15 +27,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-                .authorizeHttpRequests(auth -> auth
-                        // Allow unauthenticated access to static content
-                        .requestMatchers("/static/**", "/public/**", "/resources/**", "/favicon.ico").permitAll()
-                        // Allow unauthenticated access to auth routes (e.g., /api/auth/**)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()) // Require authentication for other requests
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless authentication
+        //         .authorizeHttpRequests(auth -> auth
+        //                 // Allow unauthenticated access to static content
+        //                 .requestMatchers("/static/**", "/public/**", "/resources/**", "/favicon.ico").permitAll()
+        //                 // Allow unauthenticated access to auth routes (e.g., /api/auth/**)
+        //                 .requestMatchers("/api/auth/**").permitAll()
+        //                 .anyRequest().authenticated()) // Require authentication for other requests
+        //         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless authentication
 
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter before the default authentication filter
+        // http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter before the default authentication filter
 
         return http.build();
     }
